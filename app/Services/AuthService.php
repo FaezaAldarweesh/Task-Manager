@@ -25,7 +25,7 @@ class AuthService
         }
         return [
             'status' => 'success',
-            'user' => Auth::user(),
+            'user' => Auth::user()->name,
             'token' => $token,
             'code' => 200
         ];

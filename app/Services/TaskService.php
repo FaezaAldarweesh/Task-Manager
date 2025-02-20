@@ -23,7 +23,7 @@ class TaskService
             $tasks = Cache::remember('tasks.' . json_encode($filters), 3600, function () use ($filters) {
                 $query = Task::query();
 
-                return $query->type($filters['type'] ?? null)
+                return $query->start_date($filters['start_date'] ?? null)
                     ->status($filters['status'] ?? null)
                     ->assignedTo($filters['assigned_to'] ?? null)
                     ->dueDate($filters['due_date'] ?? null)

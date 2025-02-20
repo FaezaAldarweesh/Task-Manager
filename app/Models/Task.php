@@ -18,10 +18,10 @@ class Task extends Model
   protected $fillable = [
     'title',
     'description',
-    'type',
     'status',
     'priority',
     'due_date',
+    'start_date',
     'assigned_to',
     'created_by',
   ];
@@ -34,6 +34,7 @@ class Task extends Model
    */
   protected $casts = [
     'due_date'    => 'date',
+    'start_date'    => 'date',
     'assigned_to' => 'integer',
     'created_by'  => 'integer',
   ];
@@ -109,16 +110,16 @@ class Task extends Model
   }
 
   /**
-   * Scope for filtering by type.
+   * Scope for filtering by start_date.
    * 
    * @param mixed $query
-   * @param mixed $type
+   * @param mixed $start_date
    * @return mixed
    */
-  public function scopeType($query, $type)
+  public function scopeStart_date($query, $start_date)
   {
-    if ($type) {
-      return $query->where('type', $type);
+    if ($start_date) {
+      return $query->where('start_date', $start_date);
     }
     return $query;
   }

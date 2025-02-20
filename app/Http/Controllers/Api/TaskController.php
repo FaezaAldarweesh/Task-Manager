@@ -28,10 +28,10 @@ class TaskController extends Controller
     {
         try {
             $filters = [
-                'type'        => $request->query('type'),
                 'status'      => $request->query('status'),
                 'assigned_to' => $request->query('assigned_to'),
                 'due_date'    => $request->query('due_date'),
+                'start_date'    => $request->query('start_date'),
                 'priority'    => $request->query('priority'),
                 'depends_on'  => $request->query('depends_on'),
             ];

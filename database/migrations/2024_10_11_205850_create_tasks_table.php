@@ -15,20 +15,20 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->enum('type', ['bug', 'feature', 'improvement']);
             $table->enum('status', ['open', 'in_progress', 'completed', 'blocked']);
             $table->enum('priority', ['low', 'medium', 'high']);
             $table->date('due_date')->nullable();
+            $table->date('start_date')->nullable();
             $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
 
             // Indexes
-            $table->index(['type']);
             $table->index(['status']);
             $table->index(['priority']);
             $table->index(['due_date']);
+            $table->index(['start_date']);
             $table->index(['assigned_to']);
             $table->index(['created_by']);
         });

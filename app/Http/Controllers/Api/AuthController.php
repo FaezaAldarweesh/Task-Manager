@@ -88,7 +88,7 @@ class AuthController extends Controller
     public function refresh()
     {
         return $this->success([
-            'user' => Auth::user(),
+            'user' => Auth::user()->name,
             'authorisation' => [
                 'token' => Auth::refresh(),
                 'type' => 'bearer',
