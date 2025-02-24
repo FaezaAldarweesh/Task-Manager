@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->enum('status', ['open', 'in_progress', 'completed', 'blocked']);
+            $table->enum('status', ['open', 'in_progress', 'completed']);
             $table->enum('priority', ['low', 'medium', 'high']);
             $table->date('due_date')->nullable();
             $table->date('start_date')->nullable();

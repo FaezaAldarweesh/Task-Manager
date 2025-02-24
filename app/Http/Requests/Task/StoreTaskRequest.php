@@ -45,8 +45,7 @@ class StoreTaskRequest extends FormRequest
         return [
             'title' => 'required|string|max:100|min:2',
             'description' => 'nullable|string|max:1000',
-            'type' => 'required|in:bug,feature,improvement',
-            'status' => 'required|in:open,in_progress,completed,blocked',
+            'status' => 'required|in:open,in_progress,completed',
             'priority' => 'required|in:low,medium,high',
             'due_date' => 'nullable|date|after_or_equal:today',
             'assigned_to' => 'nullable|exists:users,id',
@@ -64,7 +63,6 @@ class StoreTaskRequest extends FormRequest
         return [
             'title' => 'task title',
             'description' => 'task description',
-            'type' => 'task type',
             'status' => 'task status',
             'priority' => 'task priority',
             'due_date' => 'due date',

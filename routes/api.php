@@ -57,7 +57,7 @@ Route::middleware(['throttle:60,1', 'security'])->group(function () {
     Route::delete('tasks/{id}', [TaskController::class, 'destroy'])->middleware('permission:task');
 
     // 2-  Soft-Delete
-    Route::get('/tasks/deleted', [TaskController::class, 'listDeletedTasks'])->middleware('permission:task');
+    Route::get('/tasks/deleted', [TaskController::class, 'listDeletedTasks']);
     Route::post('/tasks/{id}/restore', [TaskController::class, 'restoreTask'])->middleware('permission:task');
     Route::delete('/tasks/{id}/force-delete', [TaskController::class, 'forceDeleteTask'])->middleware('permission:task');
 
@@ -65,9 +65,14 @@ Route::middleware(['throttle:60,1', 'security'])->group(function () {
     Route::post('/tasks/{id}/assign', [TaskController::class, 'assignTask'])->middleware('permission:status');
     Route::put('/tasks/{id}/reassign', [TaskController::class, 'reassignTask'])->middleware('permission:status');
     Route::put('/tasks/{id}/status', [TaskController::class, 'updateTaskStatus'])->middleware('permission:full_access');
-    Route::get('/tasks/blocked-late', [TaskController::class, 'blockedAndLateTasks'])->middleware('permission:task');
     Route::post('/tasks/{id}/comment', [TaskController::class, 'addComment'])->middleware('permission:comment');
     Route::post('/tasks/{id}/attachment', [TaskController::class, 'addAttachment'])->middleware('permission:attachment');
+
+    // 4- comment
+    Route::get( 'comments/{id}', [TaskController::class, 'allComment'])->middleware('permission:comment');
+    Route::post('comments/{id}', [TaskController::class, 'addComment'])->middleware('permission:comment');
+    Route::put('comments/{CommentId}', [TaskController::class, 'updateComment'])->middleware('permission:comment');
+    Route::delete('comments/{CommentId}', [TaskController::class, 'destroyComment'])->middleware('permission:comment');
 });
 
 // Report Route

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TaskResource;
 use App\Services\ApiResponseService;
+use App\Http\Resources\CommentResource;
 use App\Http\Requests\Task\StoreTaskRequest;
 use App\Http\Requests\Task\UpdateTaskRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -31,9 +32,7 @@ class TaskController extends Controller
                 'status'      => $request->query('status'),
                 'assigned_to' => $request->query('assigned_to'),
                 'due_date'    => $request->query('due_date'),
-                'start_date'    => $request->query('start_date'),
                 'priority'    => $request->query('priority'),
-                'depends_on'  => $request->query('depends_on'),
             ];
 
             $tasks = $this->taskService->listAllTasks($filters);
@@ -147,25 +146,6 @@ class TaskController extends Controller
     }
 
     /**
-     * Add a comment to a task.
-     */
-    public function addComment(Request $request, string $taskId)
-    {
-        $validatedData = $request->validate([
-            'comment' => 'required|string|max:1000',
-        ]);
-
-        try {
-            $newComment = $this->taskService->addCommentToTask($taskId, $validatedData['comment']);
-            return ApiResponseService::success($newComment, 'Comment added successfully.', 201);
-        } catch (ModelNotFoundException $e) {
-            return ApiResponseService::error(null, 'Task not found.', 404);
-        } catch (\Exception $e) {
-            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
-        }
-    }
-
-    /**
      * Add an attachment to a task.
      */
     public function addAttachment(Request $request, string $taskId)
@@ -233,7 +213,7 @@ class TaskController extends Controller
 
         try {
             $task = $this->taskService->updateTaskStatus($id, $validated);
-            return ApiResponseService::success($task, 'Status updated successfully.', 201);
+            return ApiResponseService::success(new TaskResource($task), 'Status updated successfully.', 201);
         } catch (ModelNotFoundException $e) {
             return ApiResponseService::error(null, 'Task not found.', 404);
         } catch (\Exception $e) {
@@ -241,15 +221,70 @@ class TaskController extends Controller
         }
     }
 
+
     /**
-     * List blocked and late tasks.
+     * all comments on the task.
      */
-    public function blockedAndLateTasks(Request $request)
+    public function allComment(string $taskId)
     {
         try {
-            $tasks = $this->taskService->listBlockedAndLateTasks();
+            $allComments = $this->taskService->allCommentToTask($taskId);
+            return ApiResponseService::success(CommentResource::collection($allComments), 'Comments retrieved successfully.', 201);
+        } catch (ModelNotFoundException $e) {
+            return ApiResponseService::error(null, 'Comments not found.', 404);
+        } catch (\Exception $e) {
+            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
+        }
+    }
 
-            return ApiResponseService::success(TaskResource::collection($tasks), 'Blocked and late tasks retrieved successfully.', 200);
+    /**
+     * Add a comment to a task.
+     */
+    public function addComment(Request $request, string $taskId)
+    {
+        $validatedData = $request->validate([
+            'comment' => 'required|string|max:1000',
+        ]);
+
+        try {
+            $newComment = $this->taskService->addCommentToTask($taskId, $validatedData['comment']);
+            return ApiResponseService::success(new CommentResource($newComment), 'Comment added successfully.', 201);
+        } catch (ModelNotFoundException $e) {
+            return ApiResponseService::error(null, 'Comment not found.', 404);
+        } catch (\Exception $e) {
+            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
+        }
+    }
+
+    /**
+     * update a comment to a task.
+     */
+    public function updateComment(Request $request,string $CommentId)
+    {
+        $validatedData = $request->validate([
+            'comment' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            $updateComment = $this->taskService->updateCommentToTask( $CommentId, $validatedData['comment']);
+            return ApiResponseService::success(new CommentResource($updateComment), 'Comment update successfully.', 201);
+        } catch (ModelNotFoundException $e) {
+            return ApiResponseService::error(null, 'Comment not found.', 404);
+        } catch (\Exception $e) {
+            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
+        }
+    }
+
+    /**
+     * delete a comment to a task.
+     */
+    public function destroyComment(string $CommentId)
+    {
+        try {
+            $destroyComment = $this->taskService->destroyCommentToTask($CommentId);
+            return ApiResponseService::success(null, 'Comment destroy successfully.', 201);
+        } catch (ModelNotFoundException $e) {
+            return ApiResponseService::error(null, 'Comment not found.', 404);
         } catch (\Exception $e) {
             return ApiResponseService::error(null, 'An error occurred on the server.', 500);
         }

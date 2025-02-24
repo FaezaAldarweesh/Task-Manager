@@ -21,7 +21,6 @@ class Task extends Model
     'status',
     'priority',
     'due_date',
-    'start_date',
     'assigned_to',
     'created_by',
   ];
@@ -34,7 +33,6 @@ class Task extends Model
    */
   protected $casts = [
     'due_date'    => 'date',
-    'start_date'    => 'date',
     'assigned_to' => 'integer',
     'created_by'  => 'integer',
   ];
@@ -87,41 +85,6 @@ class Task extends Model
   public function statusUpdates()
   {
     return $this->hasMany(TaskStatusUpdate::class);
-  }
-
-  /**
-   * Relationship to tasks that this task depends on.
-   * 
-   * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-   */
-  public function dependencies()
-  {
-    return $this->belongsToMany(Task::class, 'task_dependencies', 'task_id', 'depends_on');
-  }
-
-  /**
-   * Relationship to tasks that depend on this task.
-   * 
-   * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-   */
-  public function dependentTasks()
-  {
-    return $this->belongsToMany(Task::class, 'task_dependencies', 'depends_on', 'task_id');
-  }
-
-  /**
-   * Scope for filtering by start_date.
-   * 
-   * @param mixed $query
-   * @param mixed $start_date
-   * @return mixed
-   */
-  public function scopeStart_date($query, $start_date)
-  {
-    if ($start_date) {
-      return $query->where('start_date', $start_date);
-    }
-    return $query;
   }
 
   /**
@@ -184,20 +147,4 @@ class Task extends Model
     return $query;
   }
 
-  /**
-   * Scope for filtering by dependency.
-   * 
-   * @param mixed $query
-   * @param mixed $dependsOnTaskId
-   * @return mixed
-   */
-  public function scopeDependsOn($query, $dependsOnTaskId)
-  {
-    if ($dependsOnTaskId) {
-      return $query->whereHas('dependencies', function ($q) use ($dependsOnTaskId) {
-        $q->where('depends_on', $dependsOnTaskId);
-      });
-    }
-    return $query;
-  }
 }

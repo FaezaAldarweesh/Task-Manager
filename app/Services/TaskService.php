@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Comment;
 use Carbon\Carbon;
 use App\Models\Task;
 use Illuminate\Support\Facades\Log;
@@ -20,19 +21,14 @@ class TaskService
     public function listAllTasks(array $filters = [])
     {
         try {
-          //  $tasks = Cache::remember('tasks.' . json_encode($filters), 3600, function () use ($filters) {
-                $query = Task::query();
+            $query = Task::query();
 
-                return $query->start_date($filters['start_date'] ?? null)
-                    ->status($filters['status'] ?? null)
-                    ->assignedTo($filters['assigned_to'] ?? null)
-                    ->dueDate($filters['due_date'] ?? null)
-                    ->priority($filters['priority'] ?? null)
-                    ->dependsOn($filters['depends_on'] ?? null)
-                    ->paginate(5);
-          //  });
+            return $query->status($filters['status'] ?? null)
+                ->assignedTo($filters['assigned_to'] ?? null)
+                ->dueDate($filters['due_date'] ?? null)
+                ->priority($filters['priority'] ?? null)
+                ->get();
 
-          //  return $tasks;
         } catch (\Exception $e) {
             Log::error('Failed to retrieve tasks: ' . $e->getMessage());
             throw new \Exception('An error occurred on the server.');
@@ -61,9 +57,6 @@ class TaskService
                 'user_id' => auth()->id(),
             ]);
 
-            $this->syncDependencies($task, $data);
-
-          //  Cache::forget('tasks.*');
             return $task;
         } catch (\Exception $e) {
             Log::error('Task creation failed: ' . $e->getMessage());
@@ -82,7 +75,7 @@ class TaskService
     {
         try {
             $task = Task::findOrFail($id);
-            $task->load('comments', 'attachments', 'dependentTasks', 'dependencies', 'statusUpdates');
+            $task->load('comments', 'attachments', 'statusUpdates');
 
             return $task;
         } catch (ModelNotFoundException $e) {
@@ -125,8 +118,6 @@ class TaskService
                 $this->changeTaskStatus($data, $task);
             }
 
-            $this->syncDependencies($task, $data);
-
             return $task;
         } catch (ModelNotFoundException $e) {
             Log::error('Task not found: ' . $e->getMessage());
@@ -148,7 +139,8 @@ class TaskService
     {
         try {
             $task = Task::findOrFail($id);
-
+            $task->comments()->delete();
+            $task->attachments()->delete();
             return $task->delete();
         } catch (ModelNotFoundException $e) {
             Log::error('Task not found: ' . $e->getMessage());
@@ -186,7 +178,8 @@ class TaskService
     {
         try {
             $task = Task::onlyTrashed()->findOrFail($id);
-
+            $task->comments()->forceDelete();
+            $task->attachments()->forceDelete();
             return $task->forceDelete();
         } catch (ModelNotFoundException $e) {
             Log::error('Task not found: ' . $e->getMessage());
@@ -208,7 +201,8 @@ class TaskService
     {
         try {
             $task = Task::onlyTrashed()->findOrFail($id);
-
+            $task->comments()->restore();
+            $task->attachments()->restore();
             return $task->restore();
         } catch (ModelNotFoundException $e) {
             Log::error('Task not found: ' . $e->getMessage());
@@ -216,35 +210,6 @@ class TaskService
         } catch (\Exception $e) {
             Log::error('Failed to restore task: ' . $e->getMessage());
             throw new \Exception('An error occurred on the server.');
-        }
-    }
-
-    /**
-     * Add a comment to a task.
-     * 
-     * @param string $taskId
-     * @param string $commentNEW
-     * @throws \Exception
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function addCommentToTask(string $taskId, string $commentNEW)
-    {
-        // dd($commentNEW);
-        try {
-            $task = Task::findOrFail($taskId);
-
-            $comment1 = $task->comments()->create([
-                'comment' => $commentNEW,
-                'user_id' => auth()->id(),
-            ]);
-
-            return $comment1;
-        } catch (ModelNotFoundException $e) {
-            Log::error('Task not found: ' . $e->getMessage());
-            throw new \Exception('Task not found.');
-        } catch (\Exception $e) {
-            Log::error('Failed to add comment: ' . $e->getMessage());
-            throw new \Exception('An error occurred while adding the comment.');
         }
     }
 
@@ -348,12 +313,6 @@ class TaskService
                 'user_id' => auth()->id(),
             ]);
         }
-
-        if ($newStatus === 'completed') {
-            $this->openDependentTasks($task);
-        } else {
-            $this->blockDependentTasks($task);
-        }
     }
 
     /**
@@ -382,18 +341,6 @@ class TaskService
                 'user_id' => auth()->id(),
             ]);
 
-            if ($task->due_date < now()) {
-                $task->status = 'Blocked';
-                $task->save();
-                $this->blockDependentTasks($task);
-            } else {
-                if ($data['status'] === 'completed') {
-                    $this->openDependentTasks($task);
-                } else {
-                    $this->blockDependentTasks($task);
-                }
-            }
-
             return $task;
         } catch (ModelNotFoundException $e) {
             Log::error('Task not found: ' . $e->getMessage());
@@ -405,77 +352,87 @@ class TaskService
     }
 
     /**
-     * Block dependent tasks if the task is not completed.
+     * Retrieve all comments.
      * 
-     * @param \App\Models\Task $task
-     * @return void
+     * @throws \Exception
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    private function blockDependentTasks(Task $task)
-    {
-        $dependentTasks = $task->dependentTasks()->get();
-
-        foreach ($dependentTasks as $dependentTask) {
-            if ($dependentTask->status !== 'Blocked') {
-                $dependentTask->status = 'Blocked';
-                $dependentTask->save();
-            }
-        }
-    }
-
-    /**
-     * Mark dependent tasks as Open if the task is marked as Completed.
-     * 
-     * @param \App\Models\Task $task
-     * @return void
-     */
-    private function openDependentTasks(Task $task)
-    {
-        $dependentTasks = $task->dependentTasks()->get();
-
-        foreach ($dependentTasks as $dependentTask) {
-            $dependentTask->status = 'Open';
-            $dependentTask->save();
-        }
-    }
-
-    /**
-     * Sync dependencies if provided and handle their statuses.
-     * 
-     * @param \App\Models\Task $task
-     * @param array $data
-     * @return void
-     */
-    private function syncDependencies(Task $task, array $data)
-    {
-        if (!empty($data['depends_on'])) {
-            $task->dependencies()->sync($data['depends_on']);
-
-            if ($task->status === 'completed') {
-                $this->openDependentTasks($task);
-            } else {
-                $this->blockDependentTasks($task);
-            }
-        }
-    }
-
-    /**
-     * Retrieve blocked and late tasks.
-     *
-     * Get the current date, then retrieve tasks that are blocked or have a due date in the past
-     * 
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function listBlockedAndLateTasks()
+    public function allCommentToTask($taskId)
     {
         try {
-            $currentDate = Carbon::now();
+            $comments = Comment::where('commentable_id','=',$taskId)->get();
+            return $comments->load('user');
 
-            $tasks = Task::where('status', 'blocked')
-                ->orWhere('due_date', '<', $currentDate)->get();
-
-            return $tasks;
         } catch (\Exception $e) {
-            Log::error('Failed to retrieve blocked and late tasks: ' . $e->getMessage());
+            Log::error('Failed to retrieve tasks: ' . $e->getMessage());
+            throw new \Exception('An error occurred on the server.');
+        }
+    }
+
+    /**
+     * Add a comment to a task.
+     * 
+     * @param string $taskId
+     * @param string $commentNEW
+     * @throws \Exception
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function addCommentToTask(string $taskId, string $commentNEW)
+    {
+        try {
+            $task = Task::findOrFail($taskId);
+            
+            $comment1 = $task->comments()->create([
+                'comment' => $commentNEW,
+                'user_id' => auth()->id(),
+            ]);
+
+            return $comment1->load('user');
+        } catch (ModelNotFoundException $e) {
+            Log::error('Task not found: ' . $e->getMessage());
+            throw new \Exception('Task not found.');
+        } catch (\Exception $e) {
+            Log::error('Failed to add comment: ' . $e->getMessage());
+            throw new \Exception('An error occurred while adding the comment.');
+        }
+    }
+
+    /**
+     * update a comment to a task.
+     * 
+     * @param string $CommentId
+     * @param string $commentNEW
+     * @throws \Exception
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function updateCommentToTask(string $CommentId, string $commentNEW)
+    {
+        try {    
+            $comment = Comment::where('id', $CommentId)->firstOrFail();
+            $comment->update([
+                'comment' => $commentNEW,
+            ]);
+
+            return $comment->load('user');
+        } catch (ModelNotFoundException $e) {
+            Log::error('Task not found: ' . $e->getMessage());
+            throw new \Exception('Task not found.');
+        } catch (\Exception $e) {
+            Log::error('Failed to add comment: ' . $e->getMessage());
+            throw new \Exception('An error occurred while adding the comment.');
+        }
+    }
+
+    public function destroyCommentToTask(string $CommentId)
+    {
+        try {
+            $Comment = Comment::findOrFail($CommentId);
+            return $Comment->forceDelete();
+        } catch (ModelNotFoundException $e) {
+            Log::error(message: 'Comment not found: ' . $e->getMessage());
+            throw new \Exception('Comment not found.');
+        } catch (\Exception $e) {
+            Log::error('Failed to force delete Comment: ' . $e->getMessage());
             throw new \Exception('An error occurred on the server.');
         }
     }
