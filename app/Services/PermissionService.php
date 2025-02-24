@@ -17,7 +17,8 @@ class PermissionService
     public function listAllPermissions()
     {
         try {
-            return Permission::paginate(5);
+            $permission = Permission::all();
+            return $permission;
         } catch (\Exception $e) {
             Log::error('Failed to retrieve permissions: ' . $e->getMessage());
             throw new \Exception('An error occurred on the server.');
@@ -96,70 +97,12 @@ class PermissionService
     {
         try {
             $permission = Permission::findOrFail($id);
-            return $permission->delete();
-        } catch (ModelNotFoundException $e) {
-            Log::error('Permission not found: ' . $e->getMessage());
-            throw new \Exception('Permission not found.');
-        } catch (\Exception $e) {
-            Log::error('Failed to delete permission: ' . $e->getMessage());
-            throw new \Exception('An error occurred on the server.');
-        }
-    }
-
-    /**
-     * Show soft deleted permissions.
-     * 
-     * @throws \Exception
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
-    public function listAllDeletedPermissions()
-    {
-        try {
-            return Permission::onlyTrashed()->paginate(5);
-        } catch (\Exception $e) {
-            Log::error('Failed to retrieve deleted permissions: ' . $e->getMessage());
-            throw new \Exception('An error occurred on the server.');
-        }
-    }
-
-    /**
-     * Delete a permission (force delete).
-     * 
-     * @param string $id
-     * @throws \Exception
-     * @return bool|mixed|null
-     */
-    public function forceDeletePermission(string $id)
-    {
-        try {
-            $permission = Permission::onlyTrashed()->findOrFail($id);
             return $permission->forceDelete();
         } catch (ModelNotFoundException $e) {
             Log::error('Permission not found: ' . $e->getMessage());
             throw new \Exception('Permission not found.');
         } catch (\Exception $e) {
-            Log::error('Error force deleting the permission ' . $e->getMessage());
-            throw new \Exception('An error occurred on the server.');
-        }
-    }
-
-    /**
-     * Restore soft deleted permissions.
-     * 
-     * @param string $id
-     * @throws \Exception
-     * @return bool|mixed
-     */
-    public function restorePermission(string $id)
-    {
-        try {
-            $permission = Permission::onlyTrashed()->findOrFail($id);
-            return $permission->restore();
-        } catch (ModelNotFoundException $e) {
-            Log::error('Permission not found: ' . $e->getMessage());
-            throw new \Exception('Permission not found.');
-        } catch (\Exception $e) {
-            Log::error('Error in restore the permission ' . $e->getMessage());
+            Log::error('Failed to delete permission: ' . $e->getMessage());
             throw new \Exception('An error occurred on the server.');
         }
     }

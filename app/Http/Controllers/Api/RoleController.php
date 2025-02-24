@@ -96,49 +96,6 @@ class RoleController extends Controller
     }
 
     /**
-     * Display a list of soft deleted roles.
-     */
-    public function listDeletedRoles()
-    {
-        try {
-            $deletedRoles = $this->roleService->listAllDeletedRoles();
-            return ApiResponseService::success(RoleResource::collection($deletedRoles), 'Deleted roles retrieved successfully', 200);
-        } catch (\Exception $e) {
-            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
-        }
-    }
-
-    /**
-     * Force delete the specified soft deleted role.
-     */
-    public function forceDeleteRole(string $id)
-    {
-        try {
-            $this->roleService->forceDeleteRole($id);
-            return ApiResponseService::success(null, 'Role permanently deleted successfully', 200);
-        } catch (ModelNotFoundException $e) {
-            return ApiResponseService::error(null, 'Role not found.', 404);
-        } catch (\Exception $e) {
-            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
-        }
-    }
-
-    /**
-     * Restore a soft deleted role.
-     */
-    public function restoreRole(string $id)
-    {
-        try {
-            $this->roleService->restoreRole($id);
-            return ApiResponseService::success(null, 'Role restored successfully', 200);
-        } catch (ModelNotFoundException $e) {
-            return ApiResponseService::error(null, 'Role not found.', 404);
-        } catch (\Exception $e) {
-            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
-        }
-    }
-
-    /**
      * Assign permissions to a role.
      * 
      * @param string $roleId

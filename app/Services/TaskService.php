@@ -5,7 +5,7 @@ namespace App\Services;
 use Carbon\Carbon;
 use App\Models\Task;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
+//use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class TaskService
@@ -20,7 +20,7 @@ class TaskService
     public function listAllTasks(array $filters = [])
     {
         try {
-            $tasks = Cache::remember('tasks.' . json_encode($filters), 3600, function () use ($filters) {
+          //  $tasks = Cache::remember('tasks.' . json_encode($filters), 3600, function () use ($filters) {
                 $query = Task::query();
 
                 return $query->start_date($filters['start_date'] ?? null)
@@ -30,9 +30,9 @@ class TaskService
                     ->priority($filters['priority'] ?? null)
                     ->dependsOn($filters['depends_on'] ?? null)
                     ->paginate(5);
-            });
+          //  });
 
-            return $tasks;
+          //  return $tasks;
         } catch (\Exception $e) {
             Log::error('Failed to retrieve tasks: ' . $e->getMessage());
             throw new \Exception('An error occurred on the server.');
@@ -63,7 +63,7 @@ class TaskService
 
             $this->syncDependencies($task, $data);
 
-            Cache::forget('tasks.*');
+          //  Cache::forget('tasks.*');
             return $task;
         } catch (\Exception $e) {
             Log::error('Task creation failed: ' . $e->getMessage());

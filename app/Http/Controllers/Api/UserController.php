@@ -95,49 +95,6 @@ class UserController extends Controller
     }
 
     /**
-     * Display a list of soft deleted users.
-     */
-    public function listDeletedUsers()
-    {
-        try {
-            $deletedUsers = $this->userService->listAllDeletedUsers();
-            return ApiResponseService::success(UserResource::collection($deletedUsers), 'Deleted users retrieved successfully', 200);
-        } catch (\Exception $e) {
-            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
-        }
-    }
-
-    /**
-     * Force delete the specified soft deleted user.
-     */
-    public function forceDeleteUser(string $id)
-    {
-        try {
-            $this->userService->forceDeleteUser($id);
-            return ApiResponseService::success(null, 'User permanently deleted successfully', 200);
-        } catch (ModelNotFoundException $e) {
-            return ApiResponseService::error(null, 'User not found.', 404);
-        } catch (\Exception $e) {
-            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
-        }
-    }
-
-    /**
-     * Restore a soft deleted user.
-     */
-    public function restoreUser(string $id)
-    {
-        try {
-            $this->userService->restoreUser($id);
-            return ApiResponseService::success(null, 'User restored successfully', 200);
-        } catch (ModelNotFoundException $e) {
-            return ApiResponseService::error(null, 'User not found.', 404);
-        } catch (\Exception $e) {
-            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
-        }
-    }
-
-    /**
      * Assign a role to a user.
      */
     public function assignRole(string $userId, string $roleName)

@@ -80,56 +80,13 @@ class PermissionController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage (soft-delete).
+     * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
         try {
             $this->permissionService->deletePermission($id);
             return ApiResponseService::success(null, 'Permission deleted successfully', 200);
-        } catch (ModelNotFoundException $e) {
-            return ApiResponseService::error(null, 'Permission not found.', 404);
-        } catch (\Exception $e) {
-            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
-        }
-    }
-
-    /**
-     * Display a list of soft deleted permissions.
-     */
-    public function listDeletedPermissions()
-    {
-        try {
-            $deletedPermissions = $this->permissionService->listAllDeletedPermissions();
-            return ApiResponseService::success(PermissionResource::collection($deletedPermissions), 'Deleted permissions retrieved successfully', 200);
-        } catch (\Exception $e) {
-            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
-        }
-    }
-
-    /**
-     * Force delete the specified soft deleted permission.
-     */
-    public function forceDeletePermission(string $id)
-    {
-        try {
-            $this->permissionService->forceDeletePermission($id);
-            return ApiResponseService::success(null, 'Permission permanently deleted successfully', 200);
-        } catch (ModelNotFoundException $e) {
-            return ApiResponseService::error(null, 'Permission not found.', 404);
-        } catch (\Exception $e) {
-            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
-        }
-    }
-
-    /**
-     * Restore a soft deleted permission.
-     */
-    public function restorePermission(string $id)
-    {
-        try {
-            $this->permissionService->restorePermission($id);
-            return ApiResponseService::success(null, 'Permission restored successfully', 200);
         } catch (ModelNotFoundException $e) {
             return ApiResponseService::error(null, 'Permission not found.', 404);
         } catch (\Exception $e) {
