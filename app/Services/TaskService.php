@@ -51,8 +51,10 @@ class TaskService
     {
         try {
             $task = Task::create($data);
-
+            
             $task->statusUpdates()->create([
+                'assigned_to' => $task->assigned_to, 
+                'created_by' => $task->created_by,
                 'previous_status' => null,
                 'new_status' => $data['status'],
                 'user_id' => auth()->id(),
@@ -111,6 +113,8 @@ class TaskService
 
             if (isset($data['status']) && $data['status'] !== $oldStatus) {
                 $task->statusUpdates()->create([
+                    'assigned_to' => $task->assigned_to, 
+                    'created_by' => $task->created_by,
                     'previous_status' => $oldStatus,
                     'new_status' => $data['status'],
                     'user_id' => auth()->id(),
@@ -227,6 +231,15 @@ class TaskService
         try {
             $task = Task::findOrFail($id);
             $task->update(['assigned_to' => $userId]);
+
+            $task->statusUpdates()->create([
+                'assigned_to' => $userId, 
+                'created_by' => $task->created_by,
+                'previous_status' => $task->previous_status,
+                'new_status' => $task->status,
+                'user_id' => auth()->id(),
+            ]);
+
             return $task;
         } catch (ModelNotFoundException $e) {
             Log::error('Task not found: ' . $e->getMessage());
@@ -251,6 +264,14 @@ class TaskService
             $task = Task::findOrFail($id);
             $task->assigned_to = $data['assigned_to'];
             $task->save();
+
+            $task->statusUpdates()->create([
+                'assigned_to' => $data['assigned_to'], 
+                'created_by' => $task->created_by,
+                'previous_status' => $task->previous_status,
+                'new_status' => $task->status,
+                'user_id' => auth()->id(),
+            ]);
 
             return $task;
         } catch (ModelNotFoundException $e) {
@@ -307,6 +328,8 @@ class TaskService
             $task->save();
 
             $task->statusUpdates()->create([
+                'assigned_to' => $task->assigned_to, 
+                'created_by' => $task->created_by,
                 'previous_status' => $oldStatus,
                 'new_status' => $data['status'],
                 'user_id' => auth()->id(),

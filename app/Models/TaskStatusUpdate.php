@@ -16,8 +16,10 @@ class TaskStatusUpdate extends Model
    * @var array<int, string>
    */
   protected $fillable = [
+    'assigned_to', 
+    'created_by',
     'task_id',
-    'user_id',
+    'user_id', //Who made the edit
     'previous_status',
     'new_status',
   ];

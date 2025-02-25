@@ -74,11 +74,14 @@ Route::middleware(['throttle:60,1', 'security'])->group(function () {
     Route::delete('attachment/{attachmentid}', [TaskController::class, 'destroyattachment'])->middleware('permission:comment');
 
 
-    // Department
+    // Department Routes
     Route::get('departments', [DepartmentController::class, 'index']);
     Route::post('departments', [DepartmentController::class, 'store']);
     Route::put('departments/{id}', [DepartmentController::class, 'update']);
     Route::delete('departments/{id}', [DepartmentController::class, 'destroy']);
+
+    // log
+    Route::get('logs', [TaskController::class, 'logs']);
 
 });
 

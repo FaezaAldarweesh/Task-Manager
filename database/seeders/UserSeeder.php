@@ -62,7 +62,7 @@ class UserSeeder extends Seeder
             'department_id' => 1,
             'password' => '12345678',
         ]);
-        $empolyee1->assignRoles([3]);
+        $empolyee1->assignRoles([4]);
 
         $empolyee2 = User::create([
             'name' => 'empolyee2',
@@ -70,7 +70,7 @@ class UserSeeder extends Seeder
             'department_id' => 1,
             'password' => '12345678',
         ]);
-        $empolyee2->assignRoles([3]);
+        $empolyee2->assignRoles([4]);
 
         
         $empolyee3 = User::create([
@@ -79,7 +79,7 @@ class UserSeeder extends Seeder
             'department_id' => 2,
             'password' => '12345678',
         ]);
-        $empolyee3->assignRoles([3]);
+        $empolyee3->assignRoles([4]);
 
         $empolyee4 = User::create([
             'name' => 'empolyee4',
@@ -87,6 +87,6 @@ class UserSeeder extends Seeder
             'department_id' => 2,
             'password' => '12345678',
         ]);
-        $empolyee4->assignRoles([3]);
+        $empolyee4->assignRoles([4]);
     }
 }

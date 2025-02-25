@@ -52,7 +52,8 @@ class TaskController extends Controller
         try {
             $newTask = $this->taskService->createTask($validated);
             return ApiResponseService::success(new TaskResource($newTask), 'Task created successfully', 201);
-        } catch (\Exception $e) {
+        }  catch (\Exception $e) {
+            Log::error('Task store failed: ' . $e->getMessage());
             return ApiResponseService::error(null, 'An error occurred on the server.', 500);
         }
     }

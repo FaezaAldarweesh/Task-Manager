@@ -18,7 +18,6 @@ return new class extends Migration
             $table->enum('status', ['open', 'in_progress', 'completed']);
             $table->enum('priority', ['low', 'medium', 'high']);
             $table->date('due_date')->nullable();
-            $table->date('start_date')->nullable();
             $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->timestamps();
@@ -28,7 +27,6 @@ return new class extends Migration
             $table->index(['status']);
             $table->index(['priority']);
             $table->index(['due_date']);
-            $table->index(['start_date']);
             $table->index(['assigned_to']);
             $table->index(['created_by']);
         });
