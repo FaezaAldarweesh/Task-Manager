@@ -14,21 +14,27 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         $adminRole = Role::create([
-            'name' => 'admin',
+            'name' => 'CEO',
             'description' => 'Administrator with full access'
         ]);
-        $adminRole->assignPermissions([1, 2, 3, 4, 5]);
+        $adminRole->assignPermissions([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
         $leaderRole = Role::create([
-            'name' => 'leader',
-            'description' => 'Team Leader with full task persmissions'
+            'name' => 'Leader Manager',
+            'description' => 'Leader Manager with full access'
         ]);
-        $leaderRole->assignPermissions([2, 3, 4, 5]);
+        $leaderRole->assignPermissions([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
         $developerRole = Role::create([
-            'name' => 'developer',
+            'name' => 'Supervisor',
             'description' => 'Developer with limited access'
         ]);
-        $developerRole->assignPermissions([3, 4, 5]);
+        $developerRole->assignPermissions([4, 7, 8, 9]);
+
+        $developerRole = Role::create([
+            'name' => 'empolyee',
+            'description' => 'Developer with limited access'
+        ]);
+        $developerRole->assignPermissions([7, 8, 9]);
     }
 }

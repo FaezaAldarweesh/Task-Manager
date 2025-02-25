@@ -19,8 +19,28 @@ class PermissionSeeder extends Seeder
         ]);
 
         Permission::create([
+            'name' => 'role',
+            'description' => 'All role permissions'
+        ]);
+
+        Permission::create([
+            'name' => 'permission',
+            'description' => 'All permission permissions'
+        ]);
+
+        Permission::create([
             'name' => 'task',
             'description' => 'All task permissions'
+        ]);
+
+        Permission::create([
+            'name' => 'department',
+            'description' => 'All department permissions'
+        ]);
+
+        Permission::create([
+            'name' => 'user',
+            'description' => 'All user permissions'
         ]);
 
         Permission::create([

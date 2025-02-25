@@ -117,6 +117,16 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Define the one-to-many relationship between users and department.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    /**
      * Check if the user has a specific role by its name.
      * 
      * @param string $roleName

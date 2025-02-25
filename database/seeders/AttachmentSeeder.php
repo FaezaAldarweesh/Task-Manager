@@ -28,7 +28,7 @@ class AttachmentSeeder extends Seeder
             'type' => 'pdf',
             'path' => 'public/attachments/attachment2.pdf',
             'mime_type' => 'image/png',
-            'attachable_type' => 'App\Models\Task',
+            'attachable_type' => 'App\Models\Comment',
             'attachable_id' => 2,
             'user_id' => 2,
         ]);

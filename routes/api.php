@@ -1,14 +1,13 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ReportController;
-use App\Http\Controllers\Api\ErrorLogController;
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\DepartmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,6 +72,13 @@ Route::middleware(['throttle:60,1', 'security'])->group(function () {
     Route::delete('comments/{CommentId}', [TaskController::class, 'destroyComment'])->middleware('permission:comment');
 
     Route::delete('attachment/{attachmentid}', [TaskController::class, 'destroyattachment'])->middleware('permission:comment');
+
+
+    // Department
+    Route::get('departments', [DepartmentController::class, 'index']);
+    Route::post('departments', [DepartmentController::class, 'store']);
+    Route::put('departments/{id}', [DepartmentController::class, 'update']);
+    Route::delete('departments/{id}', [DepartmentController::class, 'destroy']);
 
 });
 

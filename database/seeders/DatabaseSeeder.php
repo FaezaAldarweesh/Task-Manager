@@ -15,12 +15,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             RoleSeeder::class,
+            DepartmentSeeder::class,
             UserSeeder::class,
             TaskSeeder::class,
             CommentSeeder::class,
             AttachmentSeeder::class,
             TaskStatusUpdateSeeder::class,
-            TaskDependencySeeder::class,
         ]);
     }
 }

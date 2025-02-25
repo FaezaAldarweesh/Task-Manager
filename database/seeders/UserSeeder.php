@@ -15,31 +15,78 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $admin = User::create([
-            'name' => 'Admin',
+            'name' => 'CEO',
             'email' => 'admin@gmail.com',
+            'department_id' => null,
             'password' => '12345678',
         ]);
         $admin->assignRoles([1]);
 
+
+        //-------------------------------------------------
+
         $leader = User::create([
-            'name' => 'Team Leader',
+            'name' => 'Leader Manager',
             'email' => 'leader@gmail.com',
+            'department_id' => null,
             'password' => '12345678',
         ]);
         $leader->assignRoles([2]);
 
-        $developer1 = User::create([
-            'name' => 'Developer',
-            'email' => 'developer1@gmail.com',
-            'password' => '12345678',
-        ]);
-        $developer1->assignRoles([3]);
 
-        $developer2 = User::create([
-            'name' => 'Developer',
-            'email' => 'developer2@gmail.com',
+        //-------------------------------------------------
+
+
+        $supervisorIt = User::create([
+            'name' => 'Supervisor',
+            'email' => 'supervisorIt@gmail.com',
+            'department_id' => 1,
             'password' => '12345678',
         ]);
-        $developer2->assignRoles([3]);
+        $supervisorIt->assignRoles([3]);
+
+        $supervisorFin = User::create([
+            'name' => 'Supervisor',
+            'email' => 'supervisorFin@gmail.com',
+            'department_id' => 2,
+            'password' => '12345678',
+        ]);
+        $supervisorFin->assignRoles([3]);
+
+
+        //-------------------------------------------------
+
+        $empolyee1 = User::create([
+            'name' => 'empolyee1',
+            'email' => 'empolyee1@gmail.com',
+            'department_id' => 1,
+            'password' => '12345678',
+        ]);
+        $empolyee1->assignRoles([3]);
+
+        $empolyee2 = User::create([
+            'name' => 'empolyee2',
+            'email' => 'empolyee2@gmail.com',
+            'department_id' => 1,
+            'password' => '12345678',
+        ]);
+        $empolyee2->assignRoles([3]);
+
+        
+        $empolyee3 = User::create([
+            'name' => 'empolyee3',
+            'email' => 'empolyee3@gmail.com',
+            'department_id' => 2,
+            'password' => '12345678',
+        ]);
+        $empolyee3->assignRoles([3]);
+
+        $empolyee4 = User::create([
+            'name' => 'empolyee4',
+            'email' => 'empolyee4@gmail.com',
+            'department_id' => 2,
+            'password' => '12345678',
+        ]);
+        $empolyee4->assignRoles([3]);
     }
 }

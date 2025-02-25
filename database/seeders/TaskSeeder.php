@@ -16,7 +16,6 @@ class TaskSeeder extends Seeder
         Task::create([
             'title' => 'Fix bug in authentication',
             'description' => 'Resolve the login bug for the application.',
-            'type' => 'bug',
             'status' => 'open',
             'priority' => 'high',
             'due_date' => '2024-10-15',
@@ -27,7 +26,6 @@ class TaskSeeder extends Seeder
         Task::create([
             'title' => 'Add new feature to dashboard',
             'description' => 'Implement analytics on the dashboard for user tracking.',
-            'type' => 'feature',
             'status' => 'in_Progress',
             'priority' => 'medium',
             'due_date' => '2024-11-01',
@@ -38,7 +36,6 @@ class TaskSeeder extends Seeder
         Task::create([
             'title' => 'Improve performance of the API',
             'description' => 'Optimize the database queries to improve the response time.',
-            'type' => 'improvement',
             'status' => 'completed',
             'priority' => 'low',
             'due_date' => '2024-09-30',
@@ -47,10 +44,9 @@ class TaskSeeder extends Seeder
         ]);
 
         Task::create([
-            'title' => 'Resolve issue with blocked tasks',
-            'description' => 'Investigate and fix the issue causing tasks to be blocked incorrectly.',
-            'type' => 'bug',
-            'status' => 'blocked',
+            'title' => 'Resolve issue with in_progress tasks',
+            'description' => 'Investigate and fix the issue causing tasks to be in_progress incorrectly.',
+            'status' => 'in_Progress',
             'priority' => 'high',
             'due_date' => '2020-10-20',
             'assigned_to' => null,
