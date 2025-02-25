@@ -13,7 +13,7 @@ class AttachmentService
     /**
      * Store an attachment (doc, pdf, excel).
      */
-    public function storeAttachment($file)
+    public function storeAttachment($file,$attachableId,$attachableType)
     {
         $originalName = $file->getClientOriginalName();
 
@@ -54,10 +54,32 @@ class AttachmentService
             'path' => $url,
             'mime_type' => $mime_type,
             'user_id' => auth()->id(),
-            'attachable_type' => null,
-            'attachable_id' => null,
+            'attachable_type' => $attachableId,
+            'attachable_id' => $attachableType,
         ]);
 
         return $attachment;
     }
+
+
+
+    public function deleteAttachment($attachmentId)
+    { 
+        // البحث عن المرفق
+        $attachment = Attachment::findOrFail($attachmentId);
+
+        // استخراج المسار الفعلي للملف من التخزين
+        $filePath = str_replace('/storage/', '', $attachment->path); // إزالة /storage/ من المسار
+
+        // التحقق من وجود الملف وحذفه
+        if (Storage::disk('public')->exists($filePath)) {
+            Storage::disk('public')->delete($filePath);
+        }
+
+        // حذف السجل من قاعدة البيانات
+        $attachment->forceDelete();
+
+        return ['message' => 'Attachment deleted successfully'];
+    }
+
 }

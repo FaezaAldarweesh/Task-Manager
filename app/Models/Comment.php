@@ -48,4 +48,14 @@ class Comment extends Model
   {
     return $this->belongsTo(User::class);
   }
+
+  /**
+   * Relationship to task's attachments (polymorphic relationship).
+   * 
+   * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+   */
+  public function attachments()
+  {
+    return $this->morphMany(Attachment::class, 'attachable');
+  }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Services\TaskService;
+use App\Services\AttachmentService;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TaskResource;
@@ -145,24 +146,6 @@ class TaskController extends Controller
         }
     }
 
-    /**
-     * Add an attachment to a task.
-     */
-    public function addAttachment(Request $request, string $taskId)
-    {
-        $validatedData = $request->validate([
-            'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
-        ]);
-
-        try {
-            $attachment = $this->taskService->addAttachment($taskId, $request->file('file'));
-            return ApiResponseService::success($attachment, 'Attachment added successfully.', 201);
-        } catch (ModelNotFoundException $e) {
-            return ApiResponseService::error(null, 'Task not found.', 404);
-        } catch (\Exception $e) {
-            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
-        }
-    }
 
     /**
      * Assign a task to a user.
@@ -229,7 +212,7 @@ class TaskController extends Controller
     {
         try {
             $allComments = $this->taskService->allCommentToTask($taskId);
-            return ApiResponseService::success(CommentResource::collection($allComments), 'Comments retrieved successfully.', 201);
+            return ApiResponseService::success(CommentResource::collection($allComments), 'Comments retrieved successfully.', 200);
         } catch (ModelNotFoundException $e) {
             return ApiResponseService::error(null, 'Comments not found.', 404);
         } catch (\Exception $e) {
@@ -244,10 +227,11 @@ class TaskController extends Controller
     {
         $validatedData = $request->validate([
             'comment' => 'required|string|max:1000',
+            'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
         ]);
 
         try {
-            $newComment = $this->taskService->addCommentToTask($taskId, $validatedData['comment']);
+            $newComment = $this->taskService->addCommentToTask($taskId, $validatedData['comment'], $validatedData['file']);
             return ApiResponseService::success(new CommentResource($newComment), 'Comment added successfully.', 201);
         } catch (ModelNotFoundException $e) {
             return ApiResponseService::error(null, 'Comment not found.', 404);
@@ -263,11 +247,12 @@ class TaskController extends Controller
     {
         $validatedData = $request->validate([
             'comment' => 'nullable|string|max:1000',
+            'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
         ]);
 
         try {
-            $updateComment = $this->taskService->updateCommentToTask( $CommentId, $validatedData['comment']);
-            return ApiResponseService::success(new CommentResource($updateComment), 'Comment update successfully.', 201);
+            $updateComment = $this->taskService->updateCommentToTask( $CommentId, $validatedData['comment'],$validatedData['file']);
+            return ApiResponseService::success(new CommentResource($updateComment), 'Comment update successfully.', 200);
         } catch (ModelNotFoundException $e) {
             return ApiResponseService::error(null, 'Comment not found.', 404);
         } catch (\Exception $e) {
@@ -282,9 +267,26 @@ class TaskController extends Controller
     {
         try {
             $destroyComment = $this->taskService->destroyCommentToTask($CommentId);
-            return ApiResponseService::success(null, 'Comment destroy successfully.', 201);
+            return ApiResponseService::success(null, 'Comment destroy successfully.', 200);
         } catch (ModelNotFoundException $e) {
             return ApiResponseService::error(null, 'Comment not found.', 404);
+        } catch (\Exception $e) {
+            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
+        }
+    }
+
+
+    /**
+     * delete a file.
+     */
+    public function destroyattachment(string $attachmentid)
+    {
+        try {
+            $attachmentService = new AttachmentService();
+            $destroyattachment = $attachmentService->deleteAttachment($attachmentid);
+            return ApiResponseService::success(null, 'attachment destroy successfully.', 200);
+        } catch (ModelNotFoundException $e) {
+            return ApiResponseService::error(null, 'attachment not found.', 404);
         } catch (\Exception $e) {
             return ApiResponseService::error(null, 'An error occurred on the server.', 500);
         }

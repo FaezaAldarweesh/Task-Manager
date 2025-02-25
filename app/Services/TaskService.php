@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Attachment;
 use App\Models\Comment;
 use Carbon\Carbon;
 use App\Models\Task;
@@ -214,36 +215,6 @@ class TaskService
     }
 
     /**
-     * Add an attachment to a task.
-     * 
-     * handle file upload and storage by AttachmentService, then associate the attachment with the task
-     * 
-     * @param string $taskId
-     * @param mixed $file
-     * @throws \Exception
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function addAttachment(string $taskId, $file)
-    {
-        try {
-            $task = Task::findOrFail($taskId);
-
-            $attachmentService = new AttachmentService();
-            $attachment = $attachmentService->storeAttachment($file);
-
-            $task->attachments()->save($attachment);
-
-            return $attachment;
-        } catch (ModelNotFoundException $e) {
-            Log::error('Task not found: ' . $e->getMessage());
-            throw new \Exception('Task not found.');
-        } catch (\Exception $e) {
-            Log::error('Failed to add attachment: ' . $e->getMessage());
-            throw new \Exception('An error occurred while adding the attachment.');
-        }
-    }
-
-    /**
      * Assign a task to a user.
      * 
      * @param string $id
@@ -361,7 +332,7 @@ class TaskService
     {
         try {
             $comments = Comment::where('commentable_id','=',$taskId)->get();
-            return $comments->load('user');
+            return $comments->load(['user','attachments']);
 
         } catch (\Exception $e) {
             Log::error('Failed to retrieve tasks: ' . $e->getMessage());
@@ -371,23 +342,31 @@ class TaskService
 
     /**
      * Add a comment to a task.
+     * handle file upload and storage by AttachmentService, then associate the attachment with the comment
+     * 
      * 
      * @param string $taskId
      * @param string $commentNEW
+     * @param mixed $file
      * @throws \Exception
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function addCommentToTask(string $taskId, string $commentNEW)
+    public function addCommentToTask(string $taskId, string $commentNEW, $file)
     {
         try {
             $task = Task::findOrFail($taskId);
-            
+
             $comment1 = $task->comments()->create([
                 'comment' => $commentNEW,
                 'user_id' => auth()->id(),
             ]);
+            
+            $attachmentService = new AttachmentService();
+            $attachment = $attachmentService->storeAttachment($file , Comment::class , $comment1->id);
 
-            return $comment1->load('user');
+            $comment1->attachments()->save($attachment);
+
+            return $comment1->load(['user', 'attachments']);
         } catch (ModelNotFoundException $e) {
             Log::error('Task not found: ' . $e->getMessage());
             throw new \Exception('Task not found.');
@@ -397,6 +376,7 @@ class TaskService
         }
     }
 
+
     /**
      * update a comment to a task.
      * 
@@ -405,15 +385,20 @@ class TaskService
      * @throws \Exception
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function updateCommentToTask(string $CommentId, string $commentNEW)
+    public function updateCommentToTask(string $CommentId, string $commentNEW, $file)
     {
         try {    
             $comment = Comment::where('id', $CommentId)->firstOrFail();
             $comment->update([
                 'comment' => $commentNEW,
             ]);
+            
+            $attachmentService = new AttachmentService();
+            $attachment = $attachmentService->storeAttachment($file , Comment::class , $comment->id);
 
-            return $comment->load('user');
+            $comment->attachments()->save($attachment);
+
+            return $comment->load(['user', 'attachments']);
         } catch (ModelNotFoundException $e) {
             Log::error('Task not found: ' . $e->getMessage());
             throw new \Exception('Task not found.');
@@ -427,7 +412,9 @@ class TaskService
     {
         try {
             $Comment = Comment::findOrFail($CommentId);
-            return $Comment->forceDelete();
+            $Comment->attachments()->forceDelete();
+            $Comment->forceDelete();
+            return true;
         } catch (ModelNotFoundException $e) {
             Log::error(message: 'Comment not found: ' . $e->getMessage());
             throw new \Exception('Comment not found.');
