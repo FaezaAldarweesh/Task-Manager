@@ -16,9 +16,11 @@ class StatusUpdateResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'assigned_to' => $this->assignedToUser->name, 
+            'created_by' => $this->createdByUser->name,
             'previous_status' => $this->previous_status,
             'new_status' => $this->new_status,
-            'updated_by' => new UserResource($this->user), 
+            'updated_by' => $this->updatedByUser->name, 
             'created_at' => $this->created_at->toDateTimeString(),
         ];
     }

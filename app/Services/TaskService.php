@@ -446,4 +446,29 @@ class TaskService
             throw new \Exception('An error occurred on the server.');
         }
     }
+
+    
+    /**
+     * return all the updates on a specific task.
+     * 
+     * 
+     * @param string $id
+     * @throws \Exception
+     * @return Task
+     */
+    public function logs(string $id)
+    {
+        try {
+            $task = Task::findOrFail($id);
+            $task->load('statusUpdates');
+
+            return $task;
+        } catch (ModelNotFoundException $e) {
+            Log::error('Task not found: ' . $e->getMessage());
+            throw new \Exception('Task not found.');
+        } catch (\Exception $e) {
+            Log::error('Failed to retrieve task: ' . $e->getMessage());
+            throw new \Exception('An error occurred on the server.');
+        }
+    }
 }

@@ -53,4 +53,30 @@ class TaskStatusUpdate extends Model
   {
     return $this->belongsTo(User::class);
   }
+
+
+  /**
+   * Get the user who was assigned to the task.
+   */
+  public function assignedToUser()
+  {
+      return $this->belongsTo(User::class, 'assigned_to');
+  }
+
+  /**
+   * Get the user who created the status update.
+   */
+  public function createdByUser()
+  {
+      return $this->belongsTo(User::class, 'created_by');
+  }
+
+  /**
+   * Get the user who made this status update.
+   */
+  public function updatedByUser()
+  {
+      return $this->belongsTo(User::class, 'user_id');
+  }
+
 }

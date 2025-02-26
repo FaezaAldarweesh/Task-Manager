@@ -292,4 +292,20 @@ class TaskController extends Controller
             return ApiResponseService::error(null, 'An error occurred on the server.', 500);
         }
     }
+
+
+    /**
+     * return all the updates on a specific task.
+     */
+    public function logs(string $id)
+    {
+        try {
+            $task = $this->taskService->logs($id);
+            return ApiResponseService::success(new TaskResource($task),  'logs Task retrieved successfully', 200);
+        } catch (ModelNotFoundException $e) {
+            return ApiResponseService::error(null, 'Task not found.', 404);
+        } catch (\Exception $e) {
+            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
+        }
+    }
 }
