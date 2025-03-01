@@ -39,6 +39,7 @@ class TaskController extends Controller
             $tasks = $this->taskService->listAllTasks($filters);
             return ApiResponseService::success(TaskResource::collection($tasks), 'Tasks retrieved successfully', 200);
         } catch (\Exception $e) {
+            Log::error('Task failed: ' . $e->getMessage());
             return ApiResponseService::error(null, 'An error occurred on the server.', 500);
         }
     }
@@ -49,8 +50,11 @@ class TaskController extends Controller
     public function store(StoreTaskRequest $request)
     {
         $validated = $request->validated();
+        $validatedData = $request->validate([
+            'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
+        ]);
         try {
-            $newTask = $this->taskService->createTask($validated);
+            $newTask = $this->taskService->createTask($validated,$validatedData['file']);
             return ApiResponseService::success(new TaskResource($newTask), 'Task created successfully', 201);
         }  catch (\Exception $e) {
             Log::error('Task store failed: ' . $e->getMessage());
@@ -79,8 +83,11 @@ class TaskController extends Controller
     public function update(UpdateTaskRequest $request, string $id)
     {
         $validated = $request->validated();
+        $validatedData = $request->validate([
+            'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
+        ]);
         try {
-            $updatedTask = $this->taskService->updateTask($id, $validated);
+            $updatedTask = $this->taskService->updateTask($id, $validated, $validatedData['file']);
             return ApiResponseService::success(new TaskResource($updatedTask), 'Task updated successfully', 200);
         } catch (ModelNotFoundException $e) {
             return ApiResponseService::error(null, 'User not found.', 404);

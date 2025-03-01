@@ -43,7 +43,10 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => 'nullable|string|max:100',
             'email' => 'nullable|string|email|max:255',
+            'department_id' => 'nullable|exists:departments,id',
             'password' => 'nullable|string|min:8|max:30',
+            'phone' => 'nullable|min:10|max:10|regex:/^([0-9\s\-\+\(\)]*)$/',
+            'location' => 'nullable|string|min:5',
             'roles' => 'nullable|array',
             'roles.*' => 'nullable|exists:roles,id',
         ];
@@ -58,7 +61,10 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => 'full name',
             'email' => 'email address',
+            'department_id' => 'department', 
             'password' => 'password',
+            'phone' => 'phone',
+            'location' => 'location',
             'roles' => 'roles',
         ];
     }
@@ -75,6 +81,8 @@ class UpdateUserRequest extends FormRequest
             'min' => 'The :attribute must be at least :min characters.',
             'email.email' => 'The :attribute must be a valid email address.',
             'roles.*.exists' => 'The selected role(s) are invalid.',
+            'regex' => 'يجب أن يحوي  :attribute على أحرف فقط',
+            'exists' => 'The selected :attribute is invalid.',
         ];
     }
 

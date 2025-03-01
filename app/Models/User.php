@@ -23,7 +23,10 @@ class User extends Authenticatable implements JWTSubject
     protected $fillable = [
         'name',
         'email',
+        'department_id',
         'password',
+        'phone',
+        'location',
     ];
 
     /**
@@ -123,7 +126,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function department()
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Department::class,'department_id');
     }
 
     /**
@@ -146,18 +149,6 @@ class User extends Authenticatable implements JWTSubject
     public function assignRoles(array $roleIds)
     {
         $this->roles()->syncWithoutDetaching($roleIds);
-    }
-
-    #TODO use it
-    /**
-     * Remove a role from the user.
-     * 
-     * @param $roleId
-     * @return void
-     */
-    public function removeRole($roleId)
-    {
-        $this->roles()->detach($roleId);
     }
 
     /**

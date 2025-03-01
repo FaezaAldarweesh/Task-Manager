@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('cascade');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('phone');
+            $table->string('location');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

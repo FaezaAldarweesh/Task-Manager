@@ -19,6 +19,8 @@ class UserSeeder extends Seeder
             'email' => 'admin@gmail.com',
             'department_id' => null,
             'password' => '12345678',
+            'phone' => '1234567890',
+            'location' => 'location',
         ]);
         $admin->assignRoles([1]);
 
@@ -30,6 +32,8 @@ class UserSeeder extends Seeder
             'email' => 'leader@gmail.com',
             'department_id' => null,
             'password' => '12345678',
+            'phone' => '1234567890',
+            'location' => 'location',
         ]);
         $leader->assignRoles([2]);
 
@@ -42,6 +46,9 @@ class UserSeeder extends Seeder
             'email' => 'supervisorIt@gmail.com',
             'department_id' => 1,
             'password' => '12345678',
+            'phone' => '1234567890',
+            'location' => 'location',
+
         ]);
         $supervisorIt->assignRoles([3]);
 
@@ -50,6 +57,8 @@ class UserSeeder extends Seeder
             'email' => 'supervisorFin@gmail.com',
             'department_id' => 2,
             'password' => '12345678',
+            'phone' => '1234567890',
+            'location' => 'location',
         ]);
         $supervisorFin->assignRoles([3]);
 
@@ -61,6 +70,8 @@ class UserSeeder extends Seeder
             'email' => 'empolyee1@gmail.com',
             'department_id' => 1,
             'password' => '12345678',
+            'phone' => '1234567890',
+            'location' => 'location',
         ]);
         $empolyee1->assignRoles([4]);
 
@@ -69,6 +80,8 @@ class UserSeeder extends Seeder
             'email' => 'empolyee2@gmail.com',
             'department_id' => 1,
             'password' => '12345678',
+            'phone' => '1234567890',
+            'location' => 'location',
         ]);
         $empolyee2->assignRoles([4]);
 
@@ -78,6 +91,8 @@ class UserSeeder extends Seeder
             'email' => 'empolyee3@gmail.com',
             'department_id' => 2,
             'password' => '12345678',
+            'phone' => '1234567890',
+            'location' => 'location',
         ]);
         $empolyee3->assignRoles([4]);
 
@@ -86,6 +101,8 @@ class UserSeeder extends Seeder
             'email' => 'empolyee4@gmail.com',
             'department_id' => 2,
             'password' => '12345678',
+            'phone' => '1234567890',
+            'location' => 'location',
         ]);
         $empolyee4->assignRoles([4]);
     }

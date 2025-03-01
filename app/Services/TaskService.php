@@ -47,7 +47,7 @@ class TaskService
      * @throws \Exception
      * @return Task|\Illuminate\Database\Eloquent\Model
      */
-    public function createTask(array $data)
+    public function createTask(array $data, $file)
     {
         try {
             $task = Task::create($data);
@@ -60,7 +60,12 @@ class TaskService
                 'user_id' => auth()->id(),
             ]);
 
-            return $task;
+            $attachmentService = new AttachmentService();
+            $attachment = $attachmentService->storeAttachment($file , Task::class , $task->id);
+
+            $task->attachments()->save($attachment);
+
+            return $task->load('attachments');
         } catch (\Exception $e) {
             Log::error('Task creation failed: ' . $e->getMessage());
             throw new \Exception('An error occurred on the server.');
@@ -103,7 +108,7 @@ class TaskService
      * @throws \Exception
      * @return Task
      */
-    public function updateTask(string $id, array $data)
+    public function updateTask(string $id, array $data, $file)
     {
         try {
             $task = Task::findOrFail($id);
@@ -120,10 +125,15 @@ class TaskService
                     'user_id' => auth()->id(),
                 ]);
 
-                $this->changeTaskStatus($data, $task);
+            $attachmentService = new AttachmentService();
+            $attachment = $attachmentService->storeAttachment($file , Task::class , $task->id);
+
+            $task->attachments()->save($attachment);
+
+            $this->changeTaskStatus($data, $task);
             }
 
-            return $task;
+            return $task->load('attachments');
         } catch (ModelNotFoundException $e) {
             Log::error('Task not found: ' . $e->getMessage());
             throw new \Exception('Task not found.');

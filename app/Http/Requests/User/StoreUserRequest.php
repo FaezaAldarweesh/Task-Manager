@@ -43,7 +43,10 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => 'required|string|max:100',
             'email' => 'required|string|email|max:255|unique:users,email',
+            'department_id' => 'required|exists:departments,id',
             'password' => 'required|string|min:8|max:30|confirmed',
+            'phone' => 'required|min:10|max:10|regex:/^([0-9\s\-\+\(\)]*)$/|unique:users,phone',
+            'location' => 'required|string|min:5',
             'roles' => 'required|array',
             'roles.*' => 'exists:roles,id',
         ];
@@ -58,7 +61,10 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => 'full name',
             'email' => 'email address',
+            'department_id' => 'department', 
             'password' => 'password',
+            'phone' => 'phone',
+            'location' => 'location',
             'roles' => 'roles',
         ];
     }
@@ -78,6 +84,8 @@ class StoreUserRequest extends FormRequest
             'unique' => 'The :attribute has already been taken.',
             'confirmed' => 'The :attribute confirmation does not match.',
             'roles.*.exists' => 'The selected role(s) are invalid.',
+            'regex' => 'يجب أن يحوي  :attribute على أحرف فقط',
+            'exists' => 'The selected :attribute is invalid.',
         ];
     }
 

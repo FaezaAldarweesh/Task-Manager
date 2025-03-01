@@ -18,7 +18,9 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'department' => $this->department->name,
+            'phone' => $this->phone,
+            'location' => $this->location,
+            'department' => new DepartmentResource($this->whenLoaded('department')),
             'roles' => RoleResource::collection($this->whenLoaded('roles')),
             'permissions' => PermissionResource::collection($this->whenLoaded('permissions')),
         ];

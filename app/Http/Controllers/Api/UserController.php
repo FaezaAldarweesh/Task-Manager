@@ -43,7 +43,7 @@ class UserController extends Controller
             $newUser = $this->userService->createUser($validated, $validated['roles']);
             return ApiResponseService::success(new UserResource($newUser), 'User created successfully', 201);
         } catch (\Exception $e) {
-            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
+            return ApiResponseService::error(null, $e->getMessage(), 500);
         }
     }
 
@@ -94,34 +94,4 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Assign a role to a user.
-     */
-    public function assignRole(string $userId, string $roleName)
-    {
-        try {
-            $data = $this->userService->assignRoleToUser($userId, $roleName);
-
-            return ApiResponseService::success($data, 'Role assigned successfully', 200);
-        } catch (ModelNotFoundException $e) {
-            return ApiResponseService::error(null, 'Role not found.', 404);
-        } catch (\Exception $e) {
-            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
-        }
-    }
-
-    /**
-     * Remove a role from a user.
-     */
-    public function removeRole(string $userId, string $roleName)
-    {
-        try {
-            $this->userService->removeRoleFromUser($userId, $roleName);
-            return ApiResponseService::success(null, 'Role removed successfully', 200);
-        } catch (ModelNotFoundException $e) {
-            return ApiResponseService::error(null, 'Role not found.', 404);
-        } catch (\Exception $e) {
-            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
-        }
-    }
 }
