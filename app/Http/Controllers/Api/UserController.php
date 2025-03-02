@@ -85,7 +85,10 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         try {
-            $this->userService->deleteUser($id);
+            $user = $this->userService->deleteUser($id);
+            if ($user instanceof \Illuminate\Http\JsonResponse) {
+                return $user;
+            }
             return ApiResponseService::success(null, 'User deleted successfully', 200);
         } catch (ModelNotFoundException $e) {
             return ApiResponseService::error(null, 'User not found.', 404);

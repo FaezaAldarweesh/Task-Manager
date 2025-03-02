@@ -97,26 +97,6 @@ class TaskSeeder extends Seeder
         ]);
 
         Task::create([
-            'title' => 'task seven',
-            'description' => 'description task seven',
-            'status' => 'open',
-            'priority' => 'high',
-            'due_date' => '2024-10-9',
-            'assigned_to' => null,
-            'created_by' => 1,
-        ]);
-
-        Task::create([
-            'title' => 'task eight',
-            'description' => 'description task eight',
-            'status' => 'open',
-            'priority' => 'low',
-            'due_date' => '2024-10-8',
-            'assigned_to' => null,
-            'created_by' => 1,
-        ]);
-
-        Task::create([
             'title' => 'task nine',
             'description' => 'description task nine',
             'status' => 'in_progress',

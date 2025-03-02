@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 //use Illuminate\Support\Facades\Cache;
+use App\Services\ApiResponseService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UserService
@@ -116,15 +117,17 @@ class UserService
     public function deleteUser(string $id)
     {
         try {
-            $user = User::findOrFail($id);
+            $user = User::with('roles')->findOrFail($id);
+            if ($user->roles->pluck('name')->toArray() == ('CEO ' || 'Leader Manager')) {
+                throw new \Exception('لا يمكنك إجراء حذف على حساب الأدمن');
+            }
 
             return $user->forceDelete();
         } catch (ModelNotFoundException $e) {
             Log::error('User not found: ' . $e->getMessage());
             throw new \Exception('User not found.');
-        } catch (\Exception $e) {
-            Log::error('Failed to delete user: ' . $e->getMessage());
-            throw new \Exception('An error occurred on the server.');
+        }catch (\Exception $e) { Log::error($e->getMessage());
+            return ApiResponseService::error(null, $e->getMessage(), 404);
         }
     }
 

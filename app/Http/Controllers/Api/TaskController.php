@@ -53,11 +53,11 @@ class TaskController extends Controller
     public function store(StoreTaskRequest $request)
     {
         $validated = $request->validated();
-        $validatedData = $request->validate([
-            'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
-        ]);
+
+        $file = $request->hasFile('file') ? $request->file('file') : null;
+
         try {
-            $newTask = $this->taskService->createTask($validated,$validatedData['file']);
+            $newTask = $this->taskService->createTask($validated,$file);
             return ApiResponseService::success(new TaskResource($newTask), 'Task created successfully', 201);
         }  catch (\Exception $e) {
             Log::error('Task store failed: ' . $e->getMessage());
@@ -123,6 +123,7 @@ class TaskController extends Controller
             $tasks = $this->taskService->listAllDeletedTasks();
             return ApiResponseService::success(TaskResource::collection($tasks), 'Deleted tasks retrieved successfully.', 200);
         } catch (\Exception $e) {
+            Log::error('Failed to retrieve deleted tasks: ' . $e->getMessage());
             return ApiResponseService::error(null, 'An error occurred on the server.', 500);
         }
     }

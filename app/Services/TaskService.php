@@ -14,22 +14,20 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class TaskService
 {
     /**
-     * Retrieve all tasks with pagination and optional filters using model scopes.
+     * Retrieve all tasks with  optional filters using model scopes.
      * 
      * @param array $filters
      * @throws \Exception
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function listAllTasks(array $filters = [])
     {
         try {
-            $query = Task::query();
-
-            return $query->status($filters['status'] ?? null)
-                ->assignedTo($filters['assigned_to'] ?? null)
-                ->dueDate($filters['due_date'] ?? null)
-                ->priority($filters['priority'] ?? null)
-                ->get();
+            return Task::where('created_by', Auth::id())
+                        ->status($filters['status'] ?? null)
+                        ->assignedTo($filters['assigned_to'] ?? null)
+                        ->dueDate($filters['due_date'] ?? null)
+                        ->priority($filters['priority'] ?? null)
+                        ->get();
 
         } catch (\Exception $e) {
             Log::error('Failed to retrieve tasks: ' . $e->getMessage());
@@ -42,7 +40,6 @@ class TaskService
      * 
      * @param array $filters
      * @throws \Exception
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function MyTasks()
     {
@@ -76,13 +73,15 @@ class TaskService
                 'created_by' => $task->created_by,
                 'previous_status' => null,
                 'new_status' => $data['status'],
-                'user_id' => auth()->id(),
+                'user_id' => auth::id(),
             ]);
 
-            $attachmentService = new AttachmentService();
-            $attachment = $attachmentService->storeAttachment($file , Task::class , $task->id);
+            if($file != null){
+                $attachmentService = new AttachmentService();
+                $attachment = $attachmentService->storeAttachment($file , Task::class , $task->id);
 
-            $task->attachments()->save($attachment);
+                $task->attachments()->save($attachment);
+            }
 
             return $task->load(['attachments','attachments']);
         } catch (\Exception $e) {
@@ -141,7 +140,7 @@ class TaskService
                     'created_by' => $task->created_by,
                     'previous_status' => $oldStatus,
                     'new_status' => $data['status'],
-                    'user_id' => auth()->id(),
+                    'user_id' => auth::id(),
                 ]);
 
             $attachmentService = new AttachmentService();
@@ -189,12 +188,12 @@ class TaskService
      * Show soft deleted tasks.
      * 
      * @throws \Exception
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function listAllDeletedTasks()
     {
         try {
-            return Task::onlyTrashed()->paginate(5);
+            $task = Task::onlyTrashed()->get();
+            return $task;
         } catch (\Exception $e) {
             Log::error('Failed to retrieve deleted tasks: ' . $e->getMessage());
             throw new \Exception('An error occurred on the server.');
@@ -266,7 +265,7 @@ class TaskService
                 'created_by' => $task->created_by,
                 'previous_status' => $task->previous_status,
                 'new_status' => $task->status,
-                'user_id' => auth()->id(),
+                'user_id' => auth::id(),
             ]);
 
             return $task;
@@ -299,7 +298,7 @@ class TaskService
                 'created_by' => $task->created_by,
                 'previous_status' => $task->previous_status,
                 'new_status' => $task->status,
-                'user_id' => auth()->id(),
+                'user_id' => auth::id(),
             ]);
 
             return $task;
@@ -331,7 +330,7 @@ class TaskService
             $task->statusUpdates()->create([
                 'previous_status' => $oldStatus,
                 'new_status' => $newStatus,
-                'user_id' => auth()->id(),
+                'user_id' => auth::id(),
             ]);
         }
     }
@@ -361,7 +360,7 @@ class TaskService
                 'created_by' => $task->created_by,
                 'previous_status' => $oldStatus,
                 'new_status' => $data['status'],
-                'user_id' => auth()->id(),
+                'user_id' => auth::id(),
             ]);
 
             return $task;
@@ -378,7 +377,6 @@ class TaskService
      * Retrieve all comments.
      * 
      * @throws \Exception
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function allCommentToTask($taskId)
     {
@@ -410,7 +408,7 @@ class TaskService
 
             $comment1 = $task->comments()->create([
                 'comment' => $commentNEW,
-                'user_id' => auth()->id(),
+                'user_id' => auth::id(),
             ]);
             
             $attachmentService = new AttachmentService();

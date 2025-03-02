@@ -50,6 +50,8 @@ class StoreTaskRequest extends FormRequest
             'due_date' => 'nullable|date|after_or_equal:today',
             'assigned_to' => 'nullable|exists:users,id',
             'created_by' => 'required|exists:users,id',
+            'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
+
         ];
     }
 

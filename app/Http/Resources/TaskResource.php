@@ -22,7 +22,7 @@ class TaskResource extends JsonResource
             'priority' => $this->priority,
             'due_date' => $this->due_date ? $this->due_date->toDateString() : null,
             'created_by' => $this->createdBy->name,
-            'assigned_to' => $this->assignedTo->name,
+            'assigned_to' => optional($this->assignedTo)->name,
             'status_updates' => StatusUpdateResource::collection($this->whenLoaded('statusUpdates')),
             'comments' => CommentResource::collection($this->whenLoaded('comments')),
             'attachments' => AttachmentResource::collection($this->whenLoaded('attachments')),
