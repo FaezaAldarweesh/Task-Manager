@@ -411,10 +411,12 @@ class TaskService
                 'user_id' => auth::id(),
             ]);
             
-            $attachmentService = new AttachmentService();
-            $attachment = $attachmentService->storeAttachment($file , Comment::class , $comment1->id);
+            if($file != null){
+                $attachmentService = new AttachmentService();
+                $attachment = $attachmentService->storeAttachment($file , Comment::class , $comment1->id);
 
-            $comment1->attachments()->save($attachment);
+                $comment1->attachments()->save($attachment);
+            }
 
             return $comment1->load(['user', 'attachments']);
         } catch (ModelNotFoundException $e) {

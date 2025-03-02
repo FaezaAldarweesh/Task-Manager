@@ -300,11 +300,13 @@ class TaskController extends Controller
     {
         $validatedData = $request->validate([
             'comment' => 'required|string|max:1000',
-            'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
+            'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
         ]);
 
+        $file = $request->hasFile('file') ? $request->file('file') : null;
+
         try {
-            $newComment = $this->taskService->addCommentToTask($taskId, $validatedData['comment'], $validatedData['file']);
+            $newComment = $this->taskService->addCommentToTask($taskId, $validatedData['comment'], $file);
             return ApiResponseService::success(new CommentResource($newComment), 'Comment added successfully.', 201);
         } catch (ModelNotFoundException $e) {
             return ApiResponseService::error(null, 'Comment not found.', 404);
