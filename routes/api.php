@@ -46,6 +46,9 @@ Route::middleware(['throttle:60,1', 'security'])->group(function () {
     Route::group(['middleware' => ['permission:user']], function () {
         Route::apiResource('users', UserController::class);
     });
+    Route::get('view_info', [UserController::class, 'view_info']);
+    Route::post('update_info', [UserController::class, 'update_info']);
+    
 
     // Task Routes
     // 1- CRUD

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\User;
 use App\Services\UserService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Services\ApiResponseService;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -96,5 +98,37 @@ class UserController extends Controller
             return ApiResponseService::error(null, 'An error occurred on the server.', 500);
         }
     }
+
+    //===========================================================================================================================
+    /**
+     * method to show user alraedy exist
+     * @param  $user_id
+     * @return /Illuminate\Http\JsonResponse
+     */
+    public function view_info()
+    {
+        $user = User::find(Auth::id());
+        return ApiResponseService::success(new UserResource($user), 'User deleted successfully', 200);
+    }
+    //===========================================================================================================================
+    /**
+     * method to update user alraedy exist
+     * @param  UpdateUserRequest $request
+     * @return /Illuminate\Http\JsonResponse
+     */
+    public function update_info(UpdateUserRequest $request)
+    {
+        $data = $request->validated();
+        $user = User::find(Auth::id());
+
+        $user->name = $data['name'] ?? $user->name;
+        $user->phone = $data['phone'] ?? $user->phone;
+        $user->location = $data['location'] ?? $user->location;  
+
+        $user->save(); 
+
+       return ApiResponseService::success(new UserResource($user), "تمت عملية التعديل على المعلومات بنجاح", 200);
+    }
+    //===========================================================================================================================
 
 }
