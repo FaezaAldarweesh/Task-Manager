@@ -55,6 +55,12 @@ Route::middleware(['throttle:60,1', 'security'])->group(function () {
     Route::put('tasks/{id}', [TaskController::class, 'update'])->middleware('permission:update_task');
     Route::delete('tasks/{id}', [TaskController::class, 'destroy'])->middleware('permission:soft_delete_task');
 
+    //overview
+    Route::get('MyTasks', [TaskController::class, 'MyTasks'])->middleware('auth:api');
+    Route::get('open-task', [TaskController::class, 'open_task'])->middleware('auth:api');
+    Route::get('in-progress-task', [TaskController::class, 'in_progress_task'])->middleware('auth:api');
+    Route::get('completed-task', [TaskController::class, 'completed_task'])->middleware('auth:api');
+
     // 2-  Soft-Delete
     Route::get('/tasks/deleted', [TaskController::class, 'listDeletedTasks'])->middleware('permission:list_delete_task');
     Route::post('/tasks/{id}/restore', [TaskController::class, 'restoreTask'])->middleware('permission:restor_delete_task');

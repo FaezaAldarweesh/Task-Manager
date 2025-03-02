@@ -2,12 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\Attachment;
-use App\Models\Comment;
 use Carbon\Carbon;
 use App\Models\Task;
+use App\Models\Comment;
+use App\Models\Attachment;
 use Illuminate\Support\Facades\Log;
 //use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class TaskService
@@ -30,6 +31,24 @@ class TaskService
                 ->priority($filters['priority'] ?? null)
                 ->get();
 
+        } catch (\Exception $e) {
+            Log::error('Failed to retrieve tasks: ' . $e->getMessage());
+            throw new \Exception('An error occurred on the server.');
+        }
+    }
+
+    /**
+     * Retrieve all tasks that assigned to auth user.
+     * 
+     * @param array $filters
+     * @throws \Exception
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function MyTasks()
+    {
+        try {
+            $task = Task::where('assigned_to','=', Auth::id())->get();
+            return $task;
         } catch (\Exception $e) {
             Log::error('Failed to retrieve tasks: ' . $e->getMessage());
             throw new \Exception('An error occurred on the server.');
@@ -65,7 +84,7 @@ class TaskService
 
             $task->attachments()->save($attachment);
 
-            return $task->load('attachments');
+            return $task->load(['attachments','attachments']);
         } catch (\Exception $e) {
             Log::error('Task creation failed: ' . $e->getMessage());
             throw new \Exception('An error occurred on the server.');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Task;
 use Illuminate\Http\Request;
 use App\Services\TaskService;
 use App\Services\AttachmentService;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TaskResource;
 use App\Services\ApiResponseService;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\CommentResource;
 use App\Http\Requests\Task\StoreTaskRequest;
 use App\Http\Requests\Task\UpdateTaskRequest;
@@ -43,6 +45,7 @@ class TaskController extends Controller
             return ApiResponseService::error(null, 'An error occurred on the server.', 500);
         }
     }
+
 
     /**
      * Store a newly created task in storage.
@@ -212,6 +215,67 @@ class TaskController extends Controller
         }
     }
 
+    /**
+     * Display a listing of tasks that assigned to auth user.
+     */
+    public function MyTasks()
+    {
+        try {
+            $tasks = $this->taskService->MyTasks();
+            return ApiResponseService::success(TaskResource::collection($tasks), 'Tasks retrieved successfully', 200);
+        } catch (\Exception $e) {
+            Log::error('Task failed: ' . $e->getMessage());
+            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
+        }
+    }
+
+    /**
+     * return all open task  that assigned to auth user.
+     */
+    public function open_task()
+    {
+        try {
+            $tasks = Task::where('assigned_to','=', Auth::id())
+                         ->where('status' , '=', 'open')
+                         ->count();
+            return ApiResponseService::success( $tasks, 'Tasks retrieved successfully', 200);
+        } catch (\Exception $e) {
+            Log::error('Task failed: ' . $e->getMessage());
+            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
+        }
+    }
+
+    /**
+     * return all in progress task  that assigned to auth user.
+     */
+    public function in_progress_task()
+    {
+        try {
+            $tasks = Task::where('assigned_to','=', Auth::id())
+                         ->where('status' , '=', 'in_progress')
+                         ->count();
+            return ApiResponseService::success( $tasks, 'Tasks retrieved successfully', 200);
+        } catch (\Exception $e) {
+            Log::error('Task failed: ' . $e->getMessage());
+            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
+        }
+    }
+
+    /**
+     * return all completed task  that assigned to auth user.
+     */
+    public function completed_task()
+    {
+        try {
+            $tasks = Task::where('assigned_to','=', Auth::id())
+                         ->where('status' , '=', 'completed')
+                         ->count();
+            return ApiResponseService::success( $tasks, 'completed Tasks retrieved successfully', 200);
+        } catch (\Exception $e) {
+            Log::error('Task failed: ' . $e->getMessage());
+            return ApiResponseService::error(null, 'An error occurred on the server.', 500);
+        }
+    }
 
     /**
      * all comments on the task.
